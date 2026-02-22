@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>아파트 실거래가 트래커</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
+</head>
+<body>
+<div class="app">
+    <aside class="sidebar">
+        <div class="sidebar-header"><h1 class="logo">&#127968; 실거래가 트래커</h1></div>
+        <div class="sidebar-section">
+            <div class="section-title">
+                <span>&#128193; 내 폴더</span>
+                <button class="btn-icon" id="btn-add-folder" title="새 폴더">+</button>
+            </div>
+            <ul class="folder-list" id="folder-list"></ul>
+        </div>
+        <div class="sidebar-section">
+            <div class="section-title"><span>&#128203; 아파트 목록</span></div>
+            <ul class="apt-list" id="apt-list"></ul>
+        </div>
+    </aside>
+    <main class="main-content">
+        <div class="search-bar">
+            <div class="search-input-wrapper">
+                <select class="gu-select" id="gu-select"><option value="">구 선택</option></select>
+            </div>
+            <div class="search-input-wrapper" style="flex:2;">
+                <input type="text" id="search-input" placeholder="아파트 이름을 입력하세요..." autocomplete="off" disabled>
+                <span class="search-icon">&#128269;</span>
+                <div class="search-dropdown" id="search-dropdown"></div>
+            </div>
+        </div>
+        <div id="empty-state" class="empty-state">
+            <div class="empty-icon">&#128202;</div>
+            <h2>아파트를 검색해서 추가하세요</h2>
+            <p>구를 선택한 뒤 아파트 이름을 검색하고 추가하면<br>5개년 실거래가 차트를 볼 수 있습니다.</p>
+        </div>
+        <div id="chart-area" style="display:none;">
+            <div class="chart-container">
+                <div class="chart-header">
+                    <div><h2 class="chart-title" id="chart-title"></h2><p class="chart-subtitle" id="chart-subtitle"></p></div>
+                    <button class="btn-outline" id="btn-update">&#128260; 업데이트</button>
+                </div>
+                <div class="chart-wrapper"><canvas id="price-chart"></canvas></div>
+                <div id="chart-loading" class="chart-loading" style="display:none;"><div class="spinner"></div><span>데이터 수집 중... (최대 1~2분 소요)</span></div>
+            </div>
+            <div class="filter-bar"><span class="filter-label">면적 필터:</span><div class="filter-chips" id="filter-chips"></div></div>
+            <div class="table-container">
+                <table class="data-table"><thead><tr><th>거래일</th><th>전용면적</th><th>층</th><th>거래금액</th></tr></thead><tbody id="table-body"></tbody></table>
+            </div>
+            <div class="update-info">마지막 업데이트: <span id="last-updated">-</span></div>
+        </div>
+    </main>
+</div>
+<div class="modal-overlay" id="modal-folder">
+    <div class="modal"><h3>&#128193; 새 폴더 만들기</h3><input type="text" id="folder-name-input" placeholder="폴더 이름"><div class="modal-actions"><button class="btn-outline" onclick="closeModal('modal-folder')">취소</button><button class="btn-primary" id="btn-confirm-folder">만들기</button></div></div>
+</div>
+<div class="modal-overlay" id="modal-add-apt">
+    <div class="modal"><h3>&#127968; 아파트 추가</h3><div id="modal-apt-name" style="font-size:15px;font-weight:600;margin-bottom:4px;"></div><div id="modal-apt-location" style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;"></div><label class="modal-label">폴더 선택 (선택사항)</label><select class="modal-folder-select" id="modal-folder-select"><option value="">폴더 없음</option></select><div class="modal-actions"><button class="btn-outline" onclick="closeModal('modal-add-apt')">취소</button><button class="btn-primary" id="btn-confirm-add-apt">추가</button></div></div>
+</div>
+<script src="/static/app.js"></script>
+</body>
+</html>

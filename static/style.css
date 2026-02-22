@@ -1,0 +1,99 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap');
+:root{--bg-primary:#0f1117;--bg-secondary:#161822;--bg-card:#1c1f2e;--bg-hover:#252839;--bg-active:#2a2d42;--text-primary:#e8eaed;--text-secondary:#9aa0a6;--text-muted:#5f6368;--accent:#6c9eff;--accent-hover:#88b4ff;--accent-bg:rgba(108,158,255,0.1);--accent-border:rgba(108,158,255,0.3);--danger:#ff6b6b;--success:#51cf66;--border:#2a2d3e;--radius:10px;--radius-sm:6px;--sidebar-width:280px;--shadow:0 2px 12px rgba(0,0,0,0.3);--shadow-lg:0 8px 32px rgba(0,0,0,0.4)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Noto Sans KR',-apple-system,sans-serif;background:var(--bg-primary);color:var(--text-primary);height:100vh;overflow:hidden}
+.app{display:flex;height:100vh}
+.sidebar{width:var(--sidebar-width);min-width:var(--sidebar-width);background:var(--bg-secondary);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto}
+.sidebar-header{padding:20px 18px 16px;border-bottom:1px solid var(--border)}
+.logo{font-size:16px;font-weight:600;letter-spacing:-0.3px}
+.sidebar-section{padding:12px 0;border-bottom:1px solid var(--border)}
+.sidebar-section:last-child{border-bottom:none;flex:1}
+.section-title{display:flex;justify-content:space-between;align-items:center;padding:4px 18px 8px;font-size:12px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.5px}
+.folder-list,.apt-list{list-style:none}
+.folder-item,.apt-item{display:flex;align-items:center;gap:8px;padding:8px 18px;cursor:pointer;transition:background 0.15s;font-size:14px;position:relative}
+.folder-item:hover,.apt-item:hover{background:var(--bg-hover)}
+.folder-item.active{background:var(--bg-active);color:var(--accent)}
+.folder-icon{font-size:14px;flex-shrink:0}
+.folder-name,.apt-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.folder-count{font-size:11px;color:var(--text-muted);background:var(--bg-hover);padding:1px 6px;border-radius:10px;min-width:20px;text-align:center}
+.apt-item{padding-right:10px}
+.apt-item .apt-name{font-size:13px}
+.apt-item.active{background:var(--accent-bg);border-right:2px solid var(--accent)}
+.apt-location{font-size:11px;color:var(--text-muted);flex-shrink:0}
+.item-delete{opacity:0;color:var(--text-muted);cursor:pointer;padding:2px 6px;border-radius:4px;transition:opacity 0.15s,color 0.15s;background:none;border:none;font-size:12px;flex-shrink:0}
+.folder-item:hover .item-delete,.apt-item:hover .item-delete{opacity:1}
+.item-delete:hover{color:var(--danger);background:rgba(255,107,107,0.1)}
+.apt-list-empty{padding:24px 18px;font-size:13px;color:var(--text-muted);text-align:center;line-height:1.6}
+.main-content{flex:1;display:flex;flex-direction:column;overflow-y:auto;padding:24px 32px}
+.search-bar{display:flex;gap:12px;margin-bottom:24px;position:relative;z-index:50}
+.search-input-wrapper{flex:1;position:relative}
+.search-input-wrapper input{width:100%;padding:10px 16px 10px 40px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);color:var(--text-primary);font-size:14px;font-family:inherit;outline:none;transition:border-color 0.2s}
+.search-input-wrapper input:focus{border-color:var(--accent)}
+.search-input-wrapper input::placeholder{color:var(--text-muted)}
+.search-input-wrapper input:disabled{opacity:0.5;cursor:not-allowed}
+.search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:14px;pointer-events:none}
+.gu-select{width:100%;padding:10px 14px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);color:var(--text-primary);font-size:14px;font-family:inherit;outline:none;cursor:pointer;appearance:none;transition:border-color 0.2s}
+.gu-select:focus{border-color:var(--accent)}
+.gu-select option{background:var(--bg-card);color:var(--text-primary)}
+.search-dropdown{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);max-height:320px;overflow-y:auto;z-index:100;box-shadow:var(--shadow-lg)}
+.search-dropdown:empty{display:none !important}
+.search-result-item{padding:10px 16px;cursor:pointer;transition:background 0.15s;display:flex;justify-content:space-between;align-items:center}
+.search-result-item:hover{background:var(--bg-hover)}
+.search-result-item:not(:last-child){border-bottom:1px solid var(--border)}
+.result-name{font-size:13px;font-weight:500}
+.result-location{font-size:12px;color:var(--text-secondary)}
+.result-add{font-size:11px;color:var(--accent);background:var(--accent-bg);border:1px solid var(--accent-border);border-radius:var(--radius-sm);padding:3px 10px;cursor:pointer;font-family:inherit;transition:all 0.15s;flex-shrink:0}
+.result-add:hover{background:var(--accent);color:#fff}
+.search-no-result{padding:16px;text-align:center;color:var(--text-muted);font-size:13px}
+.search-loading{padding:16px;text-align:center;color:var(--text-secondary);font-size:13px;display:flex;align-items:center;justify-content:center;gap:8px}
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;min-height:400px;color:var(--text-secondary)}
+.empty-icon{font-size:56px;margin-bottom:16px;opacity:0.5}
+.empty-state h2{font-size:18px;font-weight:500;margin-bottom:8px;color:var(--text-primary)}
+.empty-state p{font-size:14px;text-align:center;line-height:1.6}
+.chart-container{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:16px;position:relative}
+.chart-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px}
+.chart-title{font-size:20px;font-weight:600}
+.chart-subtitle{font-size:13px;color:var(--text-secondary);margin-top:4px}
+.chart-wrapper{position:relative;height:320px}
+.chart-loading{display:flex;align-items:center;justify-content:center;gap:10px;padding:20px;color:var(--text-secondary);font-size:13px}
+.filter-bar{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.filter-label{font-size:13px;color:var(--text-secondary);flex-shrink:0}
+.filter-chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{padding:5px 14px;border-radius:20px;border:1px solid var(--border);background:var(--bg-card);color:var(--text-secondary);font-size:12px;font-family:inherit;cursor:pointer;transition:all 0.15s}
+.chip:hover{border-color:var(--accent-border);color:var(--text-primary)}
+.chip.active{background:var(--accent-bg);border-color:var(--accent);color:var(--accent)}
+.table-container{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:16px}
+.data-table{width:100%;border-collapse:collapse;font-size:13px}
+.data-table th{text-align:left;padding:12px 16px;background:var(--bg-hover);color:var(--text-secondary);font-weight:500;font-size:12px;border-bottom:1px solid var(--border)}
+.data-table td{padding:10px 16px;border-bottom:1px solid var(--border)}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:var(--bg-hover)}
+.update-info{font-size:12px;color:var(--text-muted);text-align:right;padding:8px 0}
+.btn-primary{padding:10px 20px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius);font-size:14px;font-family:inherit;font-weight:500;cursor:pointer;transition:background 0.15s;white-space:nowrap}
+.btn-primary:hover{background:var(--accent-hover)}
+.btn-primary:disabled{opacity:0.5;cursor:not-allowed}
+.btn-outline{padding:8px 16px;background:transparent;color:var(--text-secondary);border:1px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:inherit;cursor:pointer;transition:all 0.15s}
+.btn-outline:hover{border-color:var(--accent-border);color:var(--text-primary)}
+.btn-outline:disabled{opacity:0.5;cursor:not-allowed}
+.btn-icon{width:24px;height:24px;display:flex;align-items:center;justify-content:center;background:none;border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-secondary);cursor:pointer;font-size:14px;transition:all 0.15s}
+.btn-icon:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-bg)}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;align-items:center;justify-content:center;z-index:1000;backdrop-filter:blur(4px)}
+.modal-overlay.show{display:flex}
+.modal{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;width:360px;box-shadow:var(--shadow-lg)}
+.modal h3{font-size:16px;font-weight:600;margin-bottom:16px}
+.modal input,.modal-folder-select{width:100%;padding:10px 14px;background:var(--bg-primary);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-primary);font-size:14px;font-family:inherit;outline:none;margin-bottom:6px}
+.modal input:focus,.modal-folder-select:focus{border-color:var(--accent)}
+.modal-folder-select{appearance:none;cursor:pointer}
+.modal-folder-select option{background:var(--bg-card);color:var(--text-primary)}
+.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
+.modal-label{font-size:12px;color:var(--text-secondary);margin-bottom:4px;display:block;margin-top:12px}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--bg-card);border:1px solid var(--success);color:var(--success);padding:12px 20px;border-radius:var(--radius);font-size:13px;z-index:2000;animation:slideUp 0.3s ease,fadeOut 0.3s ease 2.5s forwards;box-shadow:var(--shadow-lg)}
+.toast.error{border-color:var(--danger);color:var(--danger)}
+.spinner{width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.6s linear infinite;flex-shrink:0}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeOut{from{opacity:1}to{opacity:0}}
+@keyframes spin{to{transform:rotate(360deg)}}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--bg-hover);border-radius:3px}
