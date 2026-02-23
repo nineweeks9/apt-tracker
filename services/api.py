@@ -43,7 +43,7 @@ def _parse_xml(text):
     try:
         root = ET.fromstring(text)
         rc = root.findtext(".//resultCode")
-        if rc and rc != "00":
+        if rc and rc not in ("00", "000"):
             print(f"API error code: {rc} - {root.findtext('.//resultMsg','')}")
             return []
         results = []
