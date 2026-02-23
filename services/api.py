@@ -1,5 +1,6 @@
 import httpx
 import asyncio
+import xml.etree.ElementTree as ET
 from datetime import datetime
 from typing import Optional
 from config import PUBLIC_DATA_API_KEY
@@ -13,21 +14,48 @@ async def fetch_month(client, sigungu_code, year_month):
         if resp.status_code != 200:
             print(f"API status {resp.status_code} for {year_month}")
             return []
-        data = resp.json()
-        body = data.get("response", {}).get("body", {})
-        items = body.get("items", {})
-        if not items: return []
-        item_list = items.get("item", [])
-        if isinstance(item_list, dict): item_list = [item_list]
+        text = resp.text
+        print(f"API response for {year_month}: {text[:300]}")
+        try:
+            data = resp.json()
+            return _parse_json(data)
+        except Exception:
+            return _parse_xml(text)
+    except Exception as e:
+        print(f"API error ({year_month}): {e}")
+        return []
+
+def _parse_json(data):
+    body = data.get("response", {}).get("body", {})
+    items = body.get("items", {})
+    if not items: return []
+    item_list = items.get("item", [])
+    if isinstance(item_list, dict): item_list = [item_list]
+    results = []
+    for item in item_list:
+        try:
+            amt = int(str(item.get("dealAmount", "0")).replace(",", "").strip())
+            results.append({"apt_name": str(item.get("aptNm", "")).strip(), "dong": str(item.get("umdNm", "")).strip(), "deal_amount": amt, "area": float(item.get("excluUseAr", 0)), "floor": _si(item.get("floor")), "build_year": _si(item.get("buildYear")), "deal_year": _si(item.get("dealYear")), "deal_month": _si(item.get("dealMonth")), "deal_day": _si(item.get("dealDay"))})
+        except: continue
+    return results
+
+def _parse_xml(text):
+    try:
+        root = ET.fromstring(text)
+        rc = root.findtext(".//resultCode")
+        if rc and rc != "00":
+            print(f"API error code: {rc} - {root.findtext('.//resultMsg','')}")
+            return []
         results = []
-        for item in item_list:
+        for item in root.findall(".//item"):
             try:
-                amt = int(str(item.get("dealAmount", "0")).replace(",", "").strip())
-                results.append({"apt_name": str(item.get("aptNm", "")).strip(), "dong": str(item.get("umdNm", "")).strip(), "deal_amount": amt, "area": float(item.get("excluUseAr", 0)), "floor": _si(item.get("floor")), "build_year": _si(item.get("buildYear")), "deal_year": _si(item.get("dealYear")), "deal_month": _si(item.get("dealMonth")), "deal_day": _si(item.get("dealDay"))})
+                amt = int((item.findtext("dealAmount") or "0").replace(",","").strip())
+                results.append({"apt_name": (item.findtext("aptNm") or "").strip(), "dong": (item.findtext("umdNm") or "").strip(), "deal_amount": amt, "area": float(item.findtext("excluUseAr") or 0), "floor": _si(item.findtext("floor")), "build_year": _si(item.findtext("buildYear")), "deal_year": _si(item.findtext("dealYear")), "deal_month": _si(item.findtext("dealMonth")), "deal_day": _si(item.findtext("dealDay"))})
             except: continue
         return results
     except Exception as e:
-        print(f"API error ({year_month}): {e}")
+        print(f"XML parse error: {e}")
+        print(f"Raw text: {text[:500]}")
         return []
 
 async def fetch_apartment_data(sigungu_code, apt_name, years=5, last_updated=None):
