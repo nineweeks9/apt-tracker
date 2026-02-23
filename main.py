@@ -170,6 +170,22 @@ def _build_chart(rows, years=5):
         datasets.append({"label": f"{ak}㎡", "data": data})
     return {"labels": labels, "datasets": datasets}
 
+@app.get("/api/debug")
+async def debug_api():
+    """API 키와 직접 호출 결과를 확인"""
+    import httpx
+    from config import PUBLIC_DATA_API_KEY
+    key_preview = PUBLIC_DATA_API_KEY[:10] + "..." if PUBLIC_DATA_API_KEY else "EMPTY"
+    url = "http://apis.data.go.kr/1613000/RTMSDataSvcAptTradeDev/getRTMSDataSvcAptTradeDev"
+    params = {"serviceKey": PUBLIC_DATA_API_KEY, "LAWD_CD": "11650", "DEAL_YMD": "202501", "pageNo": "1", "numOfRows": "5"}
+    try:
+        async with httpx.AsyncClient() as client:
+            resp = await client.get(url, params=params, timeout=30.0)
+            return {"key_preview": key_preview, "status": resp.status_code, "content_type": resp.headers.get("content-type"), "body_preview": resp.text[:1000]}
+    except Exception as e:
+        return {"key_preview": key_preview, "error": str(e)}
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="0.0.0.0", port=PORT, reload=True)
