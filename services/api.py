@@ -84,14 +84,22 @@ async def fetch_apartment_data(sigungu_code, apt_name, years=5, last_updated=Non
     return all_tx
 
 async def search_apartments(sigungu_code, year_month):
-    async with httpx.AsyncClient() as client:
-        data = await fetch_month(client, sigungu_code, year_month)
+    now = datetime.now()
+    months = []
+    y, m = now.year, now.month
+    for _ in range(12):
+        months.append(f"{y}{m:02d}")
+        m -= 1
+        if m < 1: m = 12; y -= 1
     seen = set()
     results = []
-    for tx in data:
-        if tx["apt_name"] and tx["apt_name"] not in seen:
-            seen.add(tx["apt_name"])
-            results.append({"apt_name": tx["apt_name"], "dong": tx["dong"]})
+    async with httpx.AsyncClient() as client:
+        for ym in months:
+            data = await fetch_month(client, sigungu_code, ym)
+            for tx in data:
+                if tx["apt_name"] and tx["apt_name"] not in seen:
+                    seen.add(tx["apt_name"])
+                    results.append({"apt_name": tx["apt_name"], "dong": tx["dong"]})
     results.sort(key=lambda x: x["apt_name"])
     return results
 
